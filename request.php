@@ -15,8 +15,8 @@ if (!$name || !$email || !$start || !$end) {
   exit;
 }
 
-$OWNER_EMAIL = "YOUR@EMAIL.COM";      // <-- set this
-$FROM_EMAIL  = "no-reply@yourdomain.com"; // <-- set a valid sender if possible
+$OWNER_EMAIL = "ignace_opsommer@yahoo.com";      // <-- set this
+$FROM_EMAIL  = "ignace_opsommer@yahoo.com"; // <-- set a valid sender if possible
 
 $subjectOwner = "Nieuwe reservatie-aanvraag: $name ($start → $end)";
 $bodyOwner = "Nieuwe reservatie-aanvraag via de website:\n\n"
