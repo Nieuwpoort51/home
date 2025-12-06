@@ -123,45 +123,138 @@ h1{
   padding: 12px 14px 14px;
 }
 
-/* --- calendar --- */
-#calendar{
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
 
-.cal-month{
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0 0 12px;
-  background: #ffffff;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.08);
-}
+/* ====== KALENDER COMPLETE FIX ====== */
 
-.cal-month th, .cal-month td{
-  border: 1px solid rgba(0,0,0,0.10);
-  text-align: center;
-  font-size: 12px;
-  padding: 6px 3px;
-  min-width: 28px;
-}
-
-.cal-head{
-  background: rgba(30,123,156,0.12);
+/* Legenda bolletjes */
+.legend {
+  margin-top: 10px;
+  font-size: 14px;
   color: var(--ink);
-  font-weight: 700;
-  letter-spacing: 0.2px;
+}
+.legend .dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  margin-right: 4px;
+  border: 1px solid rgba(0,0,0,0.25);
 }
 
-.cal-weekday{ background: rgba(0,0,0,0.04); font-weight: 700; }
+/* Algemene container */
+#calendar { width: 100%; }
 
-.day-available{ background: rgba(46,139,87,0.12); }
-.day-reserved{ background: rgba(200,74,74,0.16); }
+/* Maandblok */
+.month {
+  margin-bottom: 24px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: var(--shadow);
+}
+.month h3 {
+  margin: 0 0 10px;
+  padding: 6px 0;
+  text-align: center;
+  font-size: 17px;
+  color: var(--accent2);
+  font-weight: bold;
+}
 
-.legend{ font-size: 13px; color: var(--muted); margin-top: 6px; }
-.dot{ display:inline-block; width:10px; height:10px; border-radius: 50%; margin-right:6px; vertical-align: middle; }
+/* GRID */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/* Weekdagen */
+.weekday {
+  font-weight: bold;
+  text-align: center;
+  padding: 6px 0;
+  color: var(--accent2);
+}
+
+/* DAGEN */
+.day,
+.empty {
+  height: 38px;
+  background: #f7f7f7;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* Beschikbaar */
+.day.available {
+  background: rgba(46,139,87,0.12);
+  border-color: rgba(46,139,87,0.45);
+  color: #184d2f;
+}
+
+/* Gereserveerd */
+.day.reserved {
+  background: rgba(200,74,74,0.18);
+  border-color: rgba(200,74,74,0.45);
+  color: #7c1e1e;
+  font-weight: bold;
+}
+
+/* Navigatieknoppen */
+.calendar-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.calendar-nav button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: var(--shadow);
+}
+.calendar-nav button:hover {
+  background: var(--accent2);
+}
+
+/* Verleden dagen */
+.day.past {
+  background: #e0e0e0 !important;
+  border-color: #bcbcbc !important;
+  color: #6a6a6a !important;
+  pointer-events: none;
+}
+
+/* Boekingsreeksen */
+.day.range-start {
+  background: rgba(200,74,74,0.35) !important;
+  border-color: #b44343 !important;
+  font-weight: bold;
+  border-radius: 6px 0 0 6px;
+}
+
+.day.range-middle {
+  background: rgba(200,74,74,0.25) !important;
+  border-color: rgba(200,74,74,0.25) !important;
+  border-radius: 0;
+}
+
+.day.range-end {
+  background: rgba(200,74,74,0.35) !important;
+  border-color: #b44343 !important;
+  font-weight: bold;
+  border-radius: 0 6px 6px 0;
+}
+
 
 /* --- form --- */
 .resform label{ display:block; font-size: 13px; margin: 8px 0 2px; color: var(--ink); }
@@ -235,11 +328,6 @@ h1{
     <div class="item">
       <img src="tuin.jpg" alt="Tuin">
       <p>Gezellig en volledig groen ommuurd stadstuintje met overdekt terras.</p>
-    </div>
-
-    <div class="item">
-      <img src="dogfriendly.jpg" alt="dogfriendly">
-      <p>De vakantiewoning is "dog friendly", zolang dit gebeurt met respect voor woning en meubilair!</p>
     </div>
 
     <div class="item">
@@ -386,160 +474,150 @@ h1{
     </div>
   </div>
 
+
 <script>
-  // ---------- helpers ----------
-  const todayISO = () => new Date().toISOString().slice(0,10);
-  const parseISO = iso => new Date(iso + "T00:00:00");
-  const rangeOverlaps = (aStart, aEnd, bStart, bEnd) => (aStart <= bEnd) && (bStart <= aEnd);
+document.addEventListener("DOMContentLoaded", async () => {
+    const calendarContainer = document.getElementById("calendar");
+    const reservationsUrl = "reservations.json";
 
-  let reservations = [];
+    const MONTHS_VISIBLE = 2;   // altijd 2 maanden zichtbaar
+    let currentOffset = 0;      // navigation offset (0 = huidige maand)
 
-  async function init() {
-    const startEl = document.getElementById("start_date");
-    const endEl   = document.getElementById("end_date");
+    async function loadReservations() {
+        try {
+            const response = await fetch(reservationsUrl + "?v=" + Date.now());
+            return await response.json();
+        } catch (e) {
+            console.error("Kan reservations.json niet laden", e);
+            return {};
+        }
+    }
 
-    startEl.min = todayISO();
-    endEl.min = todayISO();
+    async function renderCalendar() {
+        const reservations = await loadReservations();
+        calendarContainer.innerHTML = "";
 
-    try {
-      const res = await fetch("reservations.json", { cache: "no-store" });
-      reservations = await res.json();
-    } catch(e){
-      reservations = [];
+        const wrapper = document.createElement("div");
+        wrapper.className = "calendar-wrapper";
+
+        const nav = document.createElement("div");
+        nav.className = "calendar-nav";
+        nav.innerHTML = `
+            <button id="prevMonth">&laquo; Vorige</button>
+            <button id="nextMonth">Volgende &raquo;</button>
+        `;
+        wrapper.appendChild(nav);
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        for (let i = 0; i < MONTHS_VISIBLE; i++) {
+            const date = new Date(
+                today.getFullYear(), 
+                today.getMonth() + currentOffset + i, 
+                1
+            );
+            wrapper.appendChild(buildMonth(date, reservations, today));
+        }
+
+        calendarContainer.appendChild(wrapper);
+
+        document.getElementById("prevMonth").onclick = () => {
+            currentOffset -= 1;
+            renderCalendar();
+        };
+        document.getElementById("nextMonth").onclick = () => {
+            currentOffset += 1;
+            renderCalendar();
+        };
+    }
+
+    function buildMonth(date, reservations, today) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthName = date.toLocaleString("nl-NL", { month: "long", year: "numeric" });
+
+        const monthDiv = document.createElement("div");
+        monthDiv.className = "month";
+
+        const title = document.createElement("h3");
+        title.textContent = monthName;
+        monthDiv.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.className = "calendar-grid";
+
+        ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
+            const wd = document.createElement("div");
+            wd.className = "weekday";
+            wd.textContent = d;
+            grid.appendChild(wd);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        for (let i = 0; i < offset; i++) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            grid.appendChild(empty);
+        }
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayEl = document.createElement("div");
+            dayEl.className = "day";
+            dayEl.textContent = d;
+
+            const key = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+            const thisDate = new Date(year, month, d);
+            thisDate.setHours(0,0,0,0);
+
+// Verleden blokkeren
+if (thisDate < today) {
+    dayEl.classList.add("past");
+} 
+else if (reservations[key]) {
+    // Reservatie PERIODE detecteren
+    const prevKey = `${year}-${String(month+1).padStart(2,"0")}-${String(d-1).padStart(2,"0")}`;
+    const nextKey = `${year}-${String(month+1).padStart(2,"0")}-${String(d+1).padStart(2,"0")}`;
+
+    const prevReserved = reservations[prevKey];
+    const nextReserved = reservations[nextKey];
+
+    if (!prevReserved && nextReserved) {
+        dayEl.classList.add("range-start");
+    }
+    else if (prevReserved && nextReserved) {
+        dayEl.classList.add("range-middle");
+    }
+    else if (prevReserved && !nextReserved) {
+        dayEl.classList.add("range-end");
+    }
+    else {
+        // enkele reservatie zonder reeks
+        dayEl.classList.add("reserved");
+    }
+}
+else {
+    dayEl.classList.add("available");
+}
+
+
+
+            grid.appendChild(dayEl);
+        }
+
+        monthDiv.appendChild(grid);
+        return monthDiv;
     }
 
     renderCalendar();
-    attachValidation();
-  }
-
-  function renderCalendar() {
-    const container = document.getElementById("calendar");
-    container.innerHTML = "";
-    const now = new Date();
-
-    for(let m=0;m<3;m++){
-      const d = new Date(now.getFullYear(), now.getMonth()+m, 1);
-      container.appendChild(buildMonth(d));
-    }
-  }
-
-  function buildMonth(date){
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const monthNames = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
-
-    const table = document.createElement("table");
-    table.className = "cal-month";
-
-    // Header
-    const head = document.createElement("thead");
-    const trh = document.createElement("tr");
-    const th = document.createElement("th");
-    th.colSpan = 7; th.className="cal-head";
-    th.textContent = monthNames[month]+" "+year;
-    trh.appendChild(th); head.appendChild(trh);
-
-    const trw = document.createElement("tr");
-    ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d=>{
-      const td = document.createElement("th"); td.className="cal-weekday"; td.textContent=d;
-      trw.appendChild(td);
-    });
-    head.appendChild(trw); table.appendChild(head);
-
-    // Body
-    const body = document.createElement("tbody");
-    const first = new Date(year,month,1);
-    let start = (first.getDay()+6)%7;
-    const daysInMonth = new Date(year,month+1,0).getDate();
-    let row = document.createElement("tr");
-
-    for(let i=0;i<start;i++) row.appendChild(document.createElement("td"));
-
-    for(let day=1;day<=daysInMonth;day++){
-      const cell = document.createElement("td"); cell.textContent=day;
-      const current = new Date(year,month,day); current.setHours(0,0,0,0);
-
-      const isReserved = reservations.some(r=>{
-        const s=parseISO(r.start), e=parseISO(r.end);
-        return current>=s && current<=e;
-      });
-      const isPast = current < parseISO(todayISO());
-
-      if(isReserved){ 
-        cell.className="day-reserved"; 
-        cell.title = "Gereserveerd"; // tooltip
-      } 
-      else if(isPast){ 
-        cell.className="day-reserved"; 
-        cell.title = "Niet boekbaar"; 
-      }
-      else{ 
-        cell.className="day-available"; 
-        cell.style.cursor="pointer"; 
-        cell.title="Klik om te selecteren"; 
-
-        // clickable: auto-fill start or end date
-        cell.addEventListener("click",()=> {
-          const startEl = document.getElementById("start_date");
-          const endEl   = document.getElementById("end_date");
-          const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-
-          if(!startEl.value || (startEl.value && endEl.value)){
-            startEl.value = dateStr;
-            endEl.value = "";
-            endEl.min = dateStr;
-          } else {
-            if(dateStr >= startEl.value){
-              endEl.value = dateStr;
-            } else {
-              startEl.value = dateStr;
-              endEl.value = "";
-              endEl.min = dateStr;
-            }
-          }
-        });
-      }
-
-      row.appendChild(cell);
-      if((start+day)%7===0){ body.appendChild(row); row=document.createElement("tr"); }
-    }
-    if(row.children.length) body.appendChild(row);
-    table.appendChild(body);
-    return table;
-  }
-
-  function attachValidation(){
-    const form = document.getElementById("resForm");
-    const startEl = document.getElementById("start_date");
-    const endEl   = document.getElementById("end_date");
-    const msgOk = document.getElementById("msgOk");
-    const msgErr = document.getElementById("msgErr");
-
-    startEl.addEventListener("change",()=>{ if(startEl.value) endEl.min=startEl.value; });
-
-    form.addEventListener("submit",(e)=>{
-      msgOk.style.display="none"; msgErr.style.display="none";
-
-      const s=startEl.value, eDate=endEl.value;
-      if(!s||!eDate) return;
-
-      const start=parseISO(s), end=parseISO(eDate), today=parseISO(todayISO());
-
-      if(start<today || end<today){ e.preventDefault(); msgErr.textContent="Kies een start- en einddatum vanaf vandaag"; msgErr.style.display="block"; return; }
-      if(end<start){ e.preventDefault(); msgErr.textContent="Einddatum kan niet vóór startdatum"; msgErr.style.display="block"; return; }
-
-      const clash = reservations.some(r=>{
-        const rs=parseISO(r.start), re=parseISO(r.end);
-        return rangeOverlaps(start,end,rs,re);
-      });
-      if(clash){ e.preventDefault(); msgErr.textContent="Deze periode overlapt met een bestaande reservatie"; msgErr.style.display="block"; return; }
-
-      msgOk.textContent="Je aanvraag wordt verstuurd — bedankt!"; msgOk.style.display="block";
-    });
-  }
-
-  init();
+});
 </script>
+
+
 
 
 </body>
