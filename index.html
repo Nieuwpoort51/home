@@ -1,190 +1,207 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="format-detection" content="telephone=no" />  
   <title>Vakantiewoning Nieuwpoort-Stad</title>
 
-  <style>
-    :root{
-      --bg: #f9f9f9;
-      --paper: #ffffff;
-      --ink: #1a1a1a;
-      --muted: #4D4D4D;
-      --accent: #1e7b9c; /* zeeblauw */
-      --accent2:#0e5872;
-      --good:#2e8b57;   /* beschikbaar */
-      --bad:#c84a4a;    /* gereserveerd */
-      --shadow: 0 10px 30px rgba(0,0,0,0.12);
-      --radius: 12px;
-      --max: 520px;
-    }
+<style>
+:root{
+  --bg: #f9f9f9;
+  --paper: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #4D4D4D;
+  --accent: #1e7b9c; /* zeeblauw */
+  --accent2:#0e5872;
+  --good:#2e8b57;   /* beschikbaar */
+  --bad:#c84a4a;    /* gereserveerd */
+  --shadow: 0 10px 30px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --max: 520px;
+}
 
-    *{ box-sizing:border-box; }
+*{ box-sizing:border-box; }
 
-    body{
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 18px 14px 60px;
-      background: radial-gradient(1200px 800px at 20% -10%, #ffffff 0%, var(--bg) 55%, #f3fafc 100%);
-      color: var(--ink);
-      display: flex;
-      justify-content: center;
-    }
+body{
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 18px 14px 60px;
+  background: radial-gradient(1200px 800px at 20% -10%, #ffffff 0%, var(--bg) 55%, #f3fafc 100%);
+  color: var(--ink);
+  display: flex;
+  justify-content: center;
+}
 
-    .page{
-      width: 100%;
-      max-width: var(--max);
-    }
+.page{
+  width: 100%;
+  max-width: var(--max);
+}
 
-    h1{
-      text-align: center;
-      margin: 6px 0 18px;
-      color: var(--ink);
-      letter-spacing: 0.2px;
-      line-height: 1.15;
-    }
+h1{
+  text-align: center;
+  margin: 6px 0 18px;
+  color: var(--ink);
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+}
 
-    .sub{
-      text-align: center;
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: 14px;
-    }
+.sub{
+  text-align: center;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
 
-    .item{
-      margin: 14px 0;
-      text-align: justify;
-      background: var(--paper);
-      padding: 14px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      color: var(--muted);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
+.item{
+  margin: 14px 0;
+  text-align: justify;
+  background: var(--paper);
+  padding: 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--muted);
+  border: 1px solid rgba(0,0,0,0.06);
+}
 
-    .item img{
-      max-width: 100%;
-      border-radius: 10px;
-      display: block;
-      margin: 0 auto 10px;
-    }
+.item img{
+  max-width: 100%;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto 10px;
+}
 
-    .item2{
-      margin: 18px 0 24px;
-      text-align: justify;
-      background: #D6D6D6;
-      padding: 14px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      color: var(--ink);
-      border: 1px solid rgba(0,0,0,0.08);
-    }
+.item2 {
+  margin: 18px 0 24px;
+  text-align: justify;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); /* match section top gradient */
+  padding: 14px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  color: #ffffff;             /* white text for contrast */
+  border: 1px solid rgba(0,0,0,0.08);
+}
 
-    /* --- new: section cards (calendar + form) --- */
-    .section{
-      margin: 16px 0;
-      background: var(--paper);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
+.item2 h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  margin: 0 0 10px;
+}
 
-    .section .top{
-      padding: 12px 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-    }
+.item2 .accent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff; /* white dot for contrast */
+  flex-shrink: 0;
+}
+/* --- new: section cards (calendar + form) --- */
+.section{
+  margin: 16px 0;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0,0,0,0.08);
+  overflow: hidden;
+}
 
-    .section .top h2{
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.2px;
-    }
+.section .top{
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
 
-    .section .body{
-      padding: 12px 14px 14px;
-    }
+.section .top h2{
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+}
 
-    /* --- calendar --- */
-    #calendar{
-      width: 100%;
-      overflow-x: auto;
-      padding-bottom: 6px;
-    }
+.section .body{
+  padding: 12px 14px 14px;
+}
 
-    .cal-month{
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 0 12px;
-      background: #ffffff;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.08);
-    }
+/* --- calendar --- */
+#calendar{
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
 
-    .cal-month th, .cal-month td{
-      border: 1px solid rgba(0,0,0,0.10);
-      text-align: center;
-      font-size: 12px;
-      padding: 6px 3px;
-      min-width: 28px;
-    }
+.cal-month{
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 12px;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+}
 
-    .cal-head{
-      background: rgba(30,123,156,0.12);
-      color: var(--ink);
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
+.cal-month th, .cal-month td{
+  border: 1px solid rgba(0,0,0,0.10);
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 3px;
+  min-width: 28px;
+}
 
-    .cal-weekday{ background: rgba(0,0,0,0.04); font-weight: 700; }
+.cal-head{
+  background: rgba(30,123,156,0.12);
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
 
-    .day-available{ background: rgba(46,139,87,0.12); }
-    .day-reserved{ background: rgba(200,74,74,0.16); }
+.cal-weekday{ background: rgba(0,0,0,0.04); font-weight: 700; }
 
-    .legend{ font-size: 13px; color: var(--muted); margin-top: 6px; }
-    .dot{ display:inline-block; width:10px; height:10px; border-radius: 50%; margin-right:6px; vertical-align: middle; }
+.day-available{ background: rgba(46,139,87,0.12); }
+.day-reserved{ background: rgba(200,74,74,0.16); }
 
-    /* --- form --- */
-    .resform label{ display:block; font-size: 13px; margin: 8px 0 2px; color: var(--ink); }
-    .resform input, .resform textarea{
-      width: 100%;
-      padding: 9px;
-      border-radius: 10px;
-      border: 1px solid rgba(0,0,0,0.22);
-      font-size: 14px;
-    }
+.legend{ font-size: 13px; color: var(--muted); margin-top: 6px; }
+.dot{ display:inline-block; width:10px; height:10px; border-radius: 50%; margin-right:6px; vertical-align: middle; }
 
-    .resform textarea{ resize: vertical; min-height: 88px; }
+/* --- form --- */
+.resform label{ display:block; font-size: 13px; margin: 8px 0 2px; color: var(--ink); }
+.resform input, .resform textarea{
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.22);
+  font-size: 14px;
+}
 
-    .btn{
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px 12px;
-      border: 0;
-      border-radius: 10px;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      cursor: pointer;
-    }
-    .btn:hover{ background: var(--accent2); }
+.resform textarea{ resize: vertical; min-height: 88px; }
 
-    .msg{
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.35;
-      display: none;
-    }
-    .msg.ok{ background: rgba(46,139,87,0.14); border: 1px solid rgba(46,139,87,0.35); }
-    .msg.err{ background: rgba(200,74,74,0.14); border: 1px solid rgba(200,74,74,0.35); }
-  </style>
+.btn{
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+.btn:hover{ background: var(--accent2); }
+
+.msg{
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.35;
+  display: none;
+}
+.msg.ok{ background: rgba(46,139,87,0.14); border: 1px solid rgba(46,139,87,0.35); }
+.msg.err{ background: rgba(200,74,74,0.14); border: 1px solid rgba(200,74,74,0.35); }
+</style>
+
+
 </head>
 
 <body>
@@ -319,16 +336,17 @@
       <img src="kaart.jpg" alt="Kaart">
     </div>
 
-    <div class="item2">
-      <h2>Praktisch</h2>
-      <p>De vakantiewoning wordt enkel verhuurd aan vrienden en kennissen, aan de vaste prijs van 75€ per nacht. Reservatie aanvraag kan via onderstaand formulier.</p>
-    </div>
+ <div class="item2">
+  <h2>Praktisch</h2>
+  <p>De vakantiewoning wordt enkel verhuurd aan vrienden en kennissen, aan de vaste prijs van 75€ per nacht. Reservatie aanvraag kan via formulier onder de kalender met beschikbaarheid.</p>
+</div>
 
-    <!-- ===== NEW: Availability + Request ===== -->
+
+<!-- ===== Calendar Section ===== -->
     <div class="section">
-      <div class="top"><h2>Beschikbaarheid (kalender)</h2></div>
+      <div class="top"><h2>Beschikbaarheid</h2></div>
       <div class="body">
-        <div id="calendar" aria-label="Beschikbaarheid kalender"></div>
+        <div id="calendar" aria-label="Beschikbaarheid"></div>
         <div class="legend">
           <span><span class="dot" style="background: rgba(46,139,87,0.45);"></span> beschikbaar</span>
           &nbsp;&nbsp;
@@ -337,222 +355,192 @@
       </div>
     </div>
 
+    <!-- ===== Reservation Form Section ===== -->
     <div class="section">
       <div class="top"><h2>Reservatie aanvragen</h2></div>
       <div class="body">
-        <form class="resform" id="resForm" action="request.php" method="POST" novalidate>
-          <label>Naam</label>
-          <input type="text" name="name" required autocomplete="name">
+        <form id="resForm" class="resform" action="https://formspree.io/f/xblnkbad" method="POST">
+            <input type="hidden" name="_subject" value="Nieuwe reservatieaanvraag via website">
+            <input type="hidden" name="_redirect" value="https://nieuwpoort51.github.io/bedankt.html">
 
-          <label>E-mail</label>
-          <input type="email" name="email" required autocomplete="email">
+            <label>Naam</label>
+            <input type="text" id="name" name="name" required>
 
-          <label>Startdatum</label>
-          <input type="date" name="start_date" id="start_date" required>
+            <label>E-mail</label>
+            <input type="email" id="email" name="email" required>
 
-          <label>Einddatum</label>
-          <input type="date" name="end_date" id="end_date" required>
+            <label>Startdatum</label>
+            <input type="date" id="start_date" name="start_date" required>
 
-          <label>Bericht (optioneel)</label>
-          <textarea name="message" placeholder="Bijv. aankomsttijd, bijzonderheden, ..."></textarea>
+            <label>Einddatum</label>
+            <input type="date" id="end_date" name="end_date" required>
 
-          <button class="btn" type="submit">Aanvraag versturen</button>
+            <label>Bericht (optioneel)</label>
+            <textarea id="message" name="message" rows="4"></textarea>
 
-          <div id="msgOk" class="msg ok" role="status"></div>
-          <div id="msgErr" class="msg err" role="alert"></div>
+            <button type="submit" class="btn">Aanvraag versturen</button>
+            <div id="msgOk" class="msg ok"></div>
+            <div id="msgErr" class="msg err"></div>
         </form>
       </div>
     </div>
   </div>
 
-  <script>
-    // ---------- helpers ----------
-    const todayISO = () => {
-      const d = new Date();
-      d.setHours(0,0,0,0);
-      return d.toISOString().slice(0,10);
-    };
+<script>
+  // ---------- helpers ----------
+  const todayISO = () => new Date().toISOString().slice(0,10);
+  const parseISO = iso => new Date(iso + "T00:00:00");
+  const rangeOverlaps = (aStart, aEnd, bStart, bEnd) => (aStart <= bEnd) && (bStart <= aEnd);
 
-    const parseISO = (iso) => {
-      const d = new Date(iso + "T00:00:00");
-      d.setHours(0,0,0,0);
-      return d;
-    };
+  let reservations = [];
 
-    const rangeOverlaps = (aStart, aEnd, bStart, bEnd) => {
-      return (aStart <= bEnd) && (bStart <= aEnd);
-    };
+  async function init() {
+    const startEl = document.getElementById("start_date");
+    const endEl   = document.getElementById("end_date");
 
-    // ---------- load reservations + render calendar ----------
-    let reservations = [];
+    startEl.min = todayISO();
+    endEl.min = todayISO();
 
-    async function init() {
-      // enforce no past dates in the UI (C)
-      document.getElementById("start_date").min = todayISO();
-      document.getElementById("end_date").min = todayISO();
-
-      try {
-        const res = await fetch("reservations.json", { cache: "no-store" });
-        reservations = await res.json();
-      } catch (e) {
-        reservations = [];
-      }
-
-      renderCalendar(reservations);
-      attachValidation(reservations);
+    try {
+      const res = await fetch("reservations.json", { cache: "no-store" });
+      reservations = await res.json();
+    } catch(e){
+      reservations = [];
     }
 
-    function renderCalendar(reservations) {
-      const container = document.getElementById("calendar");
-      container.innerHTML = "";
+    renderCalendar();
+    attachValidation();
+  }
 
-      const now = new Date();
-      now.setHours(0,0,0,0);
+  function renderCalendar() {
+    const container = document.getElementById("calendar");
+    container.innerHTML = "";
+    const now = new Date();
 
-      // show current + next 2 months (simple, compact)
-      for (let m = 0; m < 3; m++) {
-        const d = new Date(now.getFullYear(), now.getMonth() + m, 1);
-        container.appendChild(buildMonth(d, reservations));
-      }
+    for(let m=0;m<4;m++){
+      const d = new Date(now.getFullYear(), now.getMonth()+m, 1);
+      container.appendChild(buildMonth(d));
     }
+  }
 
-    function buildMonth(date, reservations) {
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const monthNames = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
+  function buildMonth(date){
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const monthNames = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
 
-      const table = document.createElement("table");
-      table.className = "cal-month";
+    const table = document.createElement("table");
+    table.className = "cal-month";
 
-      const head = document.createElement("thead");
-      const trh = document.createElement("tr");
-      const th = document.createElement("th");
-      th.className = "cal-head";
-      th.colSpan = 7;
-      th.textContent = `${monthNames[month]} ${year}`;
-      trh.appendChild(th);
-      head.appendChild(trh);
+    // Header
+    const head = document.createElement("thead");
+    const trh = document.createElement("tr");
+    const th = document.createElement("th");
+    th.colSpan = 7; th.className="cal-head";
+    th.textContent = monthNames[month]+" "+year;
+    trh.appendChild(th); head.appendChild(trh);
 
-      const trw = document.createElement("tr");
-      ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
-        const td = document.createElement("th");
-        td.className = "cal-weekday";
-        td.textContent = d;
-        trw.appendChild(td);
+    const trw = document.createElement("tr");
+    ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d=>{
+      const td = document.createElement("th"); td.className="cal-weekday"; td.textContent=d;
+      trw.appendChild(td);
+    });
+    head.appendChild(trw); table.appendChild(head);
+
+    // Body
+    const body = document.createElement("tbody");
+    const first = new Date(year,month,1);
+    let start = (first.getDay()+6)%7;
+    const daysInMonth = new Date(year,month+1,0).getDate();
+    let row = document.createElement("tr");
+
+    for(let i=0;i<start;i++) row.appendChild(document.createElement("td"));
+
+    for(let day=1;day<=daysInMonth;day++){
+      const cell = document.createElement("td"); cell.textContent=day;
+      const current = new Date(year,month,day); current.setHours(0,0,0,0);
+
+      const isReserved = reservations.some(r=>{
+        const s=parseISO(r.start), e=parseISO(r.end);
+        return current>=s && current<=e;
       });
-      head.appendChild(trw);
-      table.appendChild(head);
+      const isPast = current < parseISO(todayISO());
 
-      const body = document.createElement("tbody");
+      if(isReserved){ 
+        cell.className="day-reserved"; 
+        cell.title = "Gereserveerd"; // tooltip
+      } 
+      else if(isPast){ 
+        cell.className="day-reserved"; 
+        cell.title = "Niet boekbaar"; 
+      }
+      else{ 
+        cell.className="day-available"; 
+        cell.style.cursor="pointer"; 
+        cell.title="Klik om te selecteren"; 
 
-      // first day offset (Monday-first)
-      const first = new Date(year, month, 1);
-      let start = (first.getDay() + 6) % 7; // JS Sunday=0 -> shift to Monday=0
+        // clickable: auto-fill start or end date
+        cell.addEventListener("click",()=> {
+          const startEl = document.getElementById("start_date");
+          const endEl   = document.getElementById("end_date");
+          const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      let row = document.createElement("tr");
-
-      for (let i = 0; i < start; i++) row.appendChild(document.createElement("td"));
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const cell = document.createElement("td");
-        cell.textContent = day;
-
-        const current = new Date(year, month, day);
-        current.setHours(0,0,0,0);
-
-        const isReserved = reservations.some(r => {
-          const s = parseISO(r.start);
-          const e = parseISO(r.end);
-          return current >= s && current <= e;
+          if(!startEl.value || (startEl.value && endEl.value)){
+            startEl.value = dateStr;
+            endEl.value = "";
+            endEl.min = dateStr;
+          } else {
+            if(dateStr >= startEl.value){
+              endEl.value = dateStr;
+            } else {
+              startEl.value = dateStr;
+              endEl.value = "";
+              endEl.min = dateStr;
+            }
+          }
         });
-
-        const isPast = current < parseISO(todayISO());
-
-        if (isReserved) cell.className = "day-reserved";
-        else if (isPast) cell.className = "day-reserved"; // past treated as not bookable
-        else cell.className = "day-available";
-
-        row.appendChild(cell);
-
-        if ((start + day) % 7 === 0) {
-          body.appendChild(row);
-          row = document.createElement("tr");
-        }
       }
 
-      if (row.children.length) body.appendChild(row);
-      table.appendChild(body);
-
-      return table;
+      row.appendChild(cell);
+      if((start+day)%7===0){ body.appendChild(row); row=document.createElement("tr"); }
     }
+    if(row.children.length) body.appendChild(row);
+    table.appendChild(body);
+    return table;
+  }
 
-    // ---------- form validation (B+C+D) ----------
-    function attachValidation(reservations) {
-      const form = document.getElementById("resForm");
-      const startEl = document.getElementById("start_date");
-      const endEl   = document.getElementById("end_date");
-      const msgOk = document.getElementById("msgOk");
-      const msgErr = document.getElementById("msgErr");
+  function attachValidation(){
+    const form = document.getElementById("resForm");
+    const startEl = document.getElementById("start_date");
+    const endEl   = document.getElementById("end_date");
+    const msgOk = document.getElementById("msgOk");
+    const msgErr = document.getElementById("msgErr");
 
-      const show = (el, text) => {
-        msgOk.style.display = "none";
-        msgErr.style.display = "none";
-        el.textContent = text;
-        el.style.display = "block";
-      };
+    startEl.addEventListener("change",()=>{ if(startEl.value) endEl.min=startEl.value; });
 
-      // D: end date must be >= start date (and update end.min dynamically)
-      startEl.addEventListener("change", () => {
-        if (startEl.value) endEl.min = startEl.value;
+    form.addEventListener("submit",(e)=>{
+      msgOk.style.display="none"; msgErr.style.display="none";
+
+      const s=startEl.value, eDate=endEl.value;
+      if(!s||!eDate) return;
+
+      const start=parseISO(s), end=parseISO(eDate), today=parseISO(todayISO());
+
+      if(start<today || end<today){ e.preventDefault(); msgErr.textContent="Kies een start- en einddatum vanaf vandaag"; msgErr.style.display="block"; return; }
+      if(end<start){ e.preventDefault(); msgErr.textContent="Einddatum kan niet vóór startdatum"; msgErr.style.display="block"; return; }
+
+      const clash = reservations.some(r=>{
+        const rs=parseISO(r.start), re=parseISO(r.end);
+        return rangeOverlaps(start,end,rs,re);
       });
+      if(clash){ e.preventDefault(); msgErr.textContent="Deze periode overlapt met een bestaande reservatie"; msgErr.style.display="block"; return; }
 
-      form.addEventListener("submit", (e) => {
-        msgOk.style.display = "none";
-        msgErr.style.display = "none";
+      msgOk.textContent="Je aanvraag wordt verstuurd — bedankt!"; msgOk.style.display="block";
+    });
+  }
 
-        const s = startEl.value;
-        const eDate = endEl.value;
+  init();
+</script>
 
-        if (!s || !eDate) return; // browser required will handle
 
-        const start = parseISO(s);
-        const end = parseISO(eDate);
-        const today = parseISO(todayISO());
-
-        // C: no past dates
-        if (start < today || end < today) {
-          e.preventDefault();
-          show(msgErr, "Kies een start- en einddatum vanaf vandaag (verleden is niet boekbaar).");
-          return;
-        }
-
-        // D: end must be >= start
-        if (end < start) {
-          e.preventDefault();
-          show(msgErr, "De einddatum kan niet vóór de startdatum liggen.");
-          return;
-        }
-
-        // B: overlap detection (block request if clash)
-        const clash = reservations.some(r => {
-          const rs = parseISO(r.start);
-          const re = parseISO(r.end);
-          return rangeOverlaps(start, end, rs, re);
-        });
-
-        if (clash) {
-          e.preventDefault();
-          show(msgErr, "Deze periode overlapt met een bestaande reservering. Kies een andere periode.");
-          return;
-        }
-
-        // If everything is fine, allow submit (request.php will send emails)
-        show(msgOk, "Je aanvraag wordt verstuurd — bedankt! (Je krijgt zo een bevestigingsmail.)");
-      });
-    }
-
-    init();
-  </script>
 </body>
 </html>
