@@ -1,189 +1,558 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="format-detection" content="telephone=no">  
-<title>Vakantiewoning Nieuwpoort-Stad</title>
-<style>
-body {
-font-family: Arial, sans-serif;
-margin: 0 auto;
-padding: 20px;
-background-color: #f9f9f9;
-max-width: 500px;
-color: #333333;
-}
-h1 {
-text-align: center;
-margin-bottom: 40px;
-max-width: 450px;
-color: #1a1a1a;
-}
-.item {
-margin-bottom: 30px;
-text-align: justify;
-max-width: 450px;
-background: #fff;
-padding: 15px;
-border-radius: 8px;
-box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-color: #4D4D4D;
-}
-.item img {
-max-width: 100%;
-border-radius: 8px;
-}
-.item2 {
-margin-top: 40px;
-margin-bottom: 40px;
-text-align: justify;
-max-width: 450px;
-background: #D6D6D6;
-padding: 15px;
-border-radius: 8px;
-box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-color: #1a1a1a;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no" />  
+  <title>Vakantiewoning Nieuwpoort-Stad</title>
+
+  <style>
+    :root{
+      --bg: #f9f9f9;
+      --paper: #ffffff;
+      --ink: #1a1a1a;
+      --muted: #4D4D4D;
+      --accent: #1e7b9c; /* zeeblauw */
+      --accent2:#0e5872;
+      --good:#2e8b57;   /* beschikbaar */
+      --bad:#c84a4a;    /* gereserveerd */
+      --shadow: 0 10px 30px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --max: 520px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 18px 14px 60px;
+      background: radial-gradient(1200px 800px at 20% -10%, #ffffff 0%, var(--bg) 55%, #f3fafc 100%);
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+    }
+
+    .page{
+      width: 100%;
+      max-width: var(--max);
+    }
+
+    h1{
+      text-align: center;
+      margin: 6px 0 18px;
+      color: var(--ink);
+      letter-spacing: 0.2px;
+      line-height: 1.15;
+    }
+
+    .sub{
+      text-align: center;
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .item{
+      margin: 14px 0;
+      text-align: justify;
+      background: var(--paper);
+      padding: 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .item img{
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+
+    .item2{
+      margin: 18px 0 24px;
+      text-align: justify;
+      background: #D6D6D6;
+      padding: 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      color: var(--ink);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* --- new: section cards (calendar + form) --- */
+    .section{
+      margin: 16px 0;
+      background: var(--paper);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .section .top{
+      padding: 12px 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+    }
+
+    .section .top h2{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .section .body{
+      padding: 12px 14px 14px;
+    }
+
+    /* --- calendar --- */
+    #calendar{
+      width: 100%;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .cal-month{
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 12px;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .cal-month th, .cal-month td{
+      border: 1px solid rgba(0,0,0,0.10);
+      text-align: center;
+      font-size: 12px;
+      padding: 6px 3px;
+      min-width: 28px;
+    }
+
+    .cal-head{
+      background: rgba(30,123,156,0.12);
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .cal-weekday{ background: rgba(0,0,0,0.04); font-weight: 700; }
+
+    .day-available{ background: rgba(46,139,87,0.12); }
+    .day-reserved{ background: rgba(200,74,74,0.16); }
+
+    .legend{ font-size: 13px; color: var(--muted); margin-top: 6px; }
+    .dot{ display:inline-block; width:10px; height:10px; border-radius: 50%; margin-right:6px; vertical-align: middle; }
+
+    /* --- form --- */
+    .resform label{ display:block; font-size: 13px; margin: 8px 0 2px; color: var(--ink); }
+    .resform input, .resform textarea{
+      width: 100%;
+      padding: 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.22);
+      font-size: 14px;
+    }
+
+    .resform textarea{ resize: vertical; min-height: 88px; }
+
+    .btn{
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+    }
+    .btn:hover{ background: var(--accent2); }
+
+    .msg{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.35;
+      display: none;
+    }
+    .msg.ok{ background: rgba(46,139,87,0.14); border: 1px solid rgba(46,139,87,0.35); }
+    .msg.err{ background: rgba(200,74,74,0.14); border: 1px solid rgba(200,74,74,0.35); }
+  </style>
 </head>
+
 <body>
-<h1>Vakantiewoning<br>Nieuwpoort-Stad</h1>
+  <div class="page">
+    <h1>Vakantiewoning<br>Nieuwpoort-Stad</h1>
+    <div class="item">
+      <img src="vakantiewoning.jpg" alt="Vakantiewoning">
+      <p>Genieten van de verkwikkende zeelucht en voorbij glijdende zeemeeuwen in deze leuke vakantiewoning, voor max 4 personen, adres Duinkerkestraat 51, een rustige straat dichtbij het historisch centrum en marktplein van Nieuwpoort-Stad.</p>
+    </div>
 
-<div class="item">
-<img src="vakantiewoning.jpg" alt="Vakantiewoning">
-<p>Genieten van de verkwikkende zeelucht en voorbij glijdende zeemeeuwen in deze leuke vakantiewoning, voor max 4 personen, adres Duinkerkestraat 51, een rustige straat dichtbij het historisch centrum en marktplein van Nieuwpoort-Stad.</p>
-</div>
+    <div class="item">
+      <img src="voorplaats.jpg" alt="Voorplaats">
+      <p>Starten doen we in de klassieke voorplaats waar de rust ons overvalt.</p>
+    </div>
 
-<div class="item">
-<img src="voorplaats.jpg" alt="Voorplaats">
-<p>Starten doen we in de klassieke voorplaats waar de rust ons overvalt.</p>
-</div>
+    <div class="item">
+      <img src="salon.jpg" alt="Salon">
+      <p>Gevolgd door een gezellig salon centraal in de vakantiewoning.</p>
+    </div>
 
-<div class="item">
-<img src="salon.jpg" alt="Salon">
-<p>Gevolgd door een gezellig salon centraal in de vakantiewoning.</p>
-</div>
+    <div class="item">
+      <img src="eetplaats.jpg" alt="Eetplaats">
+      <p>Eindigend in de lichtrijke eetruimte, inclusief kinderstoel, naast de open keuken.</p>
+    </div>
 
-<div class="item">
-<img src="eetplaats.jpg" alt="Eetplaats">
-<p>Eindigend in de lichtrijke eetruimte, inclusief kinderstoel, naast de open keuken.</p>
-</div>
+    <div class="item">
+      <img src="keuken.jpg" alt="Keuken">
+      <p>Volledig uitgeruste moderne keuken met SMEG fornuis, oven, microgolf, frigo, vaatwas, koffiezet, allerhande keukengerief. Ook warme koffie en geurige thee staan voor je klaar.</p>
+    </div>
 
-<div class="item">
-<img src="keuken.jpg" alt="Keuken">
-<p>Volledig uitgeruste moderne keuken met SMEG fornuis, oven, microgolf, frigo, vaatwas, koffiezet, servies, allerhande keukengerief. Ook warme koffie en geurige thee staan voor je klaar.</p>
-</div>
+    <div class="item">
+      <img src="tuin.jpg" alt="Tuin">
+      <p>Gezellig en volledig groen ommuurd stadstuintje met overdekt terras.</p>
+    </div>
 
-<div class="item">
-<img src="tuin.jpg" alt="Tuin">
-<p>Gezellig en volledig groen ommuurd stadstuintje met overdekt terras.</p>
-</div>
+    <div class="item">
+      <img src="dogfriendly.jpg" alt="dogfriendly">
+      <p>De vakantiewoning is "dog friendly", zolang dit gebeurt met respect voor woning en meubilair!</p>
+    </div>
 
-<div class="item">
-<img src="dogfriendly.jpg" alt="dogfriendly">
-<p>De vakantiewoning is "dog friendly", zolang dit gebeurt met respect voor woning en meubilair!</p>
-</div>
+    <div class="item">
+      <img src="belpop.jpg" alt="Belpop">
+      <p>Geniet van een ruime verzameling Belpop vinyl, zowel hedendaags als helemaal terug tot in de heerlijke jaren 80.</p>
+    </div>
 
-<div class="item">
-<img src="belpop.jpg" alt="Belpop">
-<p>Een ruime verzameling Belpop vinyl, zowel hedendaags als helemaal terug tot in de heerlijke jaren 80, klinkt door de bluetooth Bose luidspreker.</p>
-</div>
+    <div class="item">
+      <img src="strips.jpg" alt="Strips">
+      <p>Herontdek een reeks oude strips: De Rode Ridder, Suske & Wiske, Bakelandt, Robert & Bertrand, Jommeke, Kiekeboe, Yoko Tsuno, FC De Kampioenen, ...</p>
+    </div>
 
-<div class="item">
-<img src="strips.jpg" alt="Strips">
-<p>Herontdek een reeks oude strips: De Rode Ridder, Suske & Wiske, Bakelandt, Robert & Bertrand, Jommeke, Kiekeboe, Yoko Tsuno, FC De Kampioenen, ...</p>
-</div>
+    <div class="item">
+      <img src="gezelschapspel.jpg" alt="Gezelschapspel">
+      <p>Neem de tijd om de snuisteren in de kast met gezelschapsspelen, je hebt het door, er wordt geen tv gekeken in de vakantiewoning, ook geen internet aansluiting zodat je volop kunt genieten van elkaars gezelschap.</p>
+    </div>
 
-<div class="item">
-<img src="gezelschapspel.jpg" alt="Gezelschapspel">
-<p>Neem de tijd om de snuisteren in de kast met gezelschapsspelen, je hebt het door, er wordt geen tv gekeken in de vakantiewoning, ook geen internet aansluiting zodat je volop kunt genieten van elkaars gezelschap.</p>
-</div>
+    <div class="item">
+      <img src="slaapkamer1.jpg" alt="Slaapkamer1">
+      <p>De masterbedroom, met twijfelaarbed, verse lakens zijn voorzien.</p>
+    </div>
 
-<div class="item">
-<img src="slaapkamer1.jpg" alt="Slaapkamer1">
-<p>De masterbedroom, met twijfelaarbed, verse lakens zijn voorzien.</p>
-</div>
+    <div class="item">
+      <img src="slaapkamer2.jpg" alt="Slaapkamer2">
+      <p>Een tweede slaapkamer, eveneens vintage twijfelend.</p>
+    </div>
 
-<div class="item">
-<img src="slaapkamer2.jpg" alt="Slaapkamer2">
-<p>Een tweede slaapkamer, eveneens vintage twijfelend.</p>
-</div>
+    <div class="item">
+      <img src="badkamer.jpg" alt="Badkamer">
+      <p>Moderne badkamer met instapdouche en lavabo, uitgerust met verse handdoeken, en voorzien van shampoo, douchegel en zeep.</p>
+    </div>
 
-<div class="item">
-<img src="badkamer.jpg" alt="Badkamer">
-<p>Moderne badkamer met instapdouche en lavabo, uitgerust met verse handdoeken, en voorzien van shampoo, douchegel en zeep.</p>
-</div>
+    <div class="item">
+      <img src="fietsen.jpg" alt="Fietsen">
+      <p>Fietsen vinden hun plaats in de inkom hal.</p>
+    </div>
 
-<div class="item">
-<img src="fietsen.jpg" alt="Fietsen">
-<p>Fietsen vinden hun plaats in de inkom hal.</p>
-</div>
+    <div class="item">
+      <img src="duinkerkestraat.jpg" alt="Duinkerkestraat">
+      <p>Steeds gratis parkeermogelijkheid voor de deur, in de straat, ...</p>
+    </div>
 
-<div class="item">
-<img src="duinkerkestraat.jpg" alt="Duinkerkestraat">
-<p>Steeds gratis parkeermogelijkheid voor de deur, in de straat, ...</p>
-</div>
+    <div class="item">
+      <img src="opladen.jpg" alt="Opladen">
+      <p>4 openbare laadpunten voor elektrische wagen, eveneens gratis parkeren, op wandelafstand (50m). </p>
+    </div>
 
-<div class="item">
-<img src="opladen.jpg" alt="Opladen">
-<p>4 openbare laadpunten voor elektrische wagen, eveneens gratis parkeren, op wandelafstand (50m). </p>
-</div>
+    <div class="item">
+      <img src="marktplein.jpg" alt="Marktplein">
+      <p>Het charmante marktplein van Nieuwpoort-Stad met zijn vele gezellige restaurants vind je op 300m wandelen.</p>
+    </div>
 
-<div class="item">
-<img src="marktplein.jpg" alt="Marktplein">
-<p>Het charmante marktplein van Nieuwpoort-Stad met zijn vele gezellige restaurants vind je op 300m wandelen.</p>
-</div>
+    <div class="item">
+      <img src="frontzate.jpg" alt="Frontzate">
+      <p>De Duinkerkestraat in Nieuwpoort-Stad ligt ook letterlijk aan de start van de Frontzate, een uniek fietspad tussen Nieuwpoort en Diksmuide, ooit de spoorlijn die de kust met het hinterland verbond, loopt vandaag als een rustige groene corridor door de polders.</p>
+    </div>
 
-<div class="item">
-<img src="frontzate.jpg" alt="Frontzate">
-<p>De Duinkerkestraat in Nieuwpoort-Stad ligt ook letterlijk aan de start van de Frontzate, een uniek fietspad tussen Nieuwpoort en Diksmuide, ooit de spoorlijn die de kust met het hinterland verbond, loopt vandaag als een rustige groene corridor door de polders.</p>
-</div>
+    <div class="item">
+      <img src="koolhofput.jpg" alt="Koolhofput">
+      <p>Tussen het bruisende Nieuwpoort-Stad en het stille polderdorp Ramskapelle ligt een verborgen parel van de kust, het provinciedomein Koolhofput, een oase van groene rust en natuur, naast de Frontzate en op 500m wandelafstand van de vakantiewoning.</p>
+    </div>
 
-<div class="item">
-<img src="koolhofput.jpg" alt="Koolhofput">
-<p>Tussen het bruisende Nieuwpoort-Stad en het stille polderdorp Ramskapelle ligt een verborgen parel van de kust, het provinciedomein Koolhofput, een oase van groene rust en natuur, naast de Frontzate en op 500m wandelafstand van de vakantiewoning.</p>
-</div>
+    <div class="item">
+      <img src="vismijn.jpg" alt="Vismijn">
+      <p>Op 700m wandelen vinden we de vismijn van Nieuwpoort-Stad, de kortste weg voor verse vis van de lokale vissers naar handelaars en horeca. Aan de overkant van de vismijn vinden we dan de viswinkels De Panger, Albert, ...</p>
+    </div>
 
-<div class="item">
-<img src="vismijn.jpg" alt="Vismijn">
-<p>Op 700m wandelen vinden we de vismijn van Nieuwpoort-Stad, de kortste weg voor verse vis van de lokale vissers naar handelaars en horeca. Aan de overkant van de vismijn vinden we dan de viswinkels De Panger, Albert, ...</p>
-</div>
+    <div class="item">
+      <img src="kusttram.jpg" alt="Kusttram">
+      <p>Op 900m van de vakantiewoning, via het Marktplein van Nieuwpoort-Stad, vinden we de kusttram, die je langs de ganse Belgische kust brengt, van De Panne tot Knokke-Heist, maar ook gewoon snel tot in Nieuwpoort-Bad.</p>
+    </div>
 
-<div class="item">
-<img src="kusttram.jpg" alt="Kusttram">
-<p>Op 900m van de vakantiewoning, via het Marktplein van Nieuwpoort-Stad, vinden we de kusttram, die je langs de ganse Belgische kust brengt, van De Panne tot Knokke-Heist, maar ook gewoon snel tot in Nieuwpoort-Bad.</p>
-</div>
+    <div class="item">
+      <img src="vaargeul.jpg" alt="Vaargeul">
+      <p>Wie gewoon wil wandelen van Nieuwpoort-Stad naar Nieuwpoort-Bad kan dit ook doen langs de vaargeul, een 3km lang wandelpad dat je helemaal tot op het strand brengt.</p>
+    </div>
 
-<div class="item">
-<img src="vaargeul.jpg" alt="Vaargeul">
-<p>Wie gewoon wil wandelen van Nieuwpoort-Stad naar Nieuwpoort-Bad kan dit ook doen langs de vaargeul, een 3km lang wandelpad dat je helemaal tot op het strand brengt.</p>
-</div>
+    <div class="item">
+      <img src="staketsel.jpg" alt="Staketsel">
+      <p>Laat je betoveren door één van de absolute parels van onze Belgische kust, Nieuwpoort-Bad.</p>
+    </div>
+      
+    <div class="item">
+      <img src="wandelen.jpg" alt="Wandelen">
+      <p>Vele wandelroutes zowel ter plaatse vertrekkend of via de Kusttram, zowel uitgepijld als via knooppunten. Map met overzicht in vakantiewoning.</p>
+    </div>
 
-<div class="item">
-<img src="staketsel.jpg" alt="Staketsel">
-<p>Laat je betoveren door één van de absolute parels van onze Belgische kust, Nieuwpoort-Bad.</p>
-</div>
-  
-<div class="item">
-<img src="wandelen.jpg" alt="Wandelen">
-<p>Vele wandelroutes zowel ter plaatse vertrekkend of via de Kusttram, zowel uitgepijld als via knooppunten. Map met overzicht in vakantiewoning.</p>
-</div>
+    <div class="item">
+      <img src="mountainbike.jpg" alt="Mountainbike">
+      <p>Voor de sportievelingen hebben we de groene mountainbike lus van Nieuwpoort, het Michel Pollentier parkoers is 33km lang en passeert aan de vakantiewoning, met een mooie afwisseling van polders, duinen en strand.</p>
+    </div>
 
-<div class="item">
-<img src="mountainbike.jpg" alt="Mountainbike">
-<p>Voor de sportievelingen hebben we de groene mountainbike lus van Nieuwpoort, het Michel Pollentier parkoers is 33km lang en passeert aan de vakantiewoning, met een mooie afwisseling van polders, duinen en strand.</p>
-</div>
+    <div class="item">
+      <img src="kaart.jpg" alt="Kaart">
+    </div>
 
-<div class="item2">
-<h2>Praktisch</h2>
-<p>De vakantiewoning wordt enkel verhuurd aan vrienden en kennissen, aan de vaste prijs van 75€ per nacht. Reserveren kan via mail (ignace_opsommer@yahoo.com) of Whatsapp (0496 593 334).</p>
-</div>
+    <div class="item2">
+      <h2>Praktisch</h2>
+      <p>De vakantiewoning wordt enkel verhuurd aan vrienden en kennissen, aan de vaste prijs van 75€ per nacht. Reservatie aanvraag kan via onderstaand formulier.</p>
+    </div>
 
-<div class="item">
-<img src="kaart.jpg" alt="Kaart">
-</div>
+    <!-- ===== NEW: Availability + Request ===== -->
+    <div class="section">
+      <div class="top"><h2>Beschikbaarheid (kalender)</h2></div>
+      <div class="body">
+        <div id="calendar" aria-label="Beschikbaarheid kalender"></div>
+        <div class="legend">
+          <span><span class="dot" style="background: rgba(46,139,87,0.45);"></span> beschikbaar</span>
+          &nbsp;&nbsp;
+          <span><span class="dot" style="background: rgba(200,74,74,0.45);"></span> gereserveerd</span>
+        </div>
+      </div>
+    </div>
 
+    <div class="section">
+      <div class="top"><h2>Reservatie aanvragen</h2></div>
+      <div class="body">
+        <form class="resform" id="resForm" action="request.php" method="POST" novalidate>
+          <label>Naam</label>
+          <input type="text" name="name" required autocomplete="name">
 
+          <label>E-mail</label>
+          <input type="email" name="email" required autocomplete="email">
+
+          <label>Startdatum</label>
+          <input type="date" name="start_date" id="start_date" required>
+
+          <label>Einddatum</label>
+          <input type="date" name="end_date" id="end_date" required>
+
+          <label>Bericht (optioneel)</label>
+          <textarea name="message" placeholder="Bijv. aankomsttijd, bijzonderheden, ..."></textarea>
+
+          <button class="btn" type="submit">Aanvraag versturen</button>
+
+          <div id="msgOk" class="msg ok" role="status"></div>
+          <div id="msgErr" class="msg err" role="alert"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- helpers ----------
+    const todayISO = () => {
+      const d = new Date();
+      d.setHours(0,0,0,0);
+      return d.toISOString().slice(0,10);
+    };
+
+    const parseISO = (iso) => {
+      const d = new Date(iso + "T00:00:00");
+      d.setHours(0,0,0,0);
+      return d;
+    };
+
+    const rangeOverlaps = (aStart, aEnd, bStart, bEnd) => {
+      return (aStart <= bEnd) && (bStart <= aEnd);
+    };
+
+    // ---------- load reservations + render calendar ----------
+    let reservations = [];
+
+    async function init() {
+      // enforce no past dates in the UI (C)
+      document.getElementById("start_date").min = todayISO();
+      document.getElementById("end_date").min = todayISO();
+
+      try {
+        const res = await fetch("reservations.json", { cache: "no-store" });
+        reservations = await res.json();
+      } catch (e) {
+        reservations = [];
+      }
+
+      renderCalendar(reservations);
+      attachValidation(reservations);
+    }
+
+    function renderCalendar(reservations) {
+      const container = document.getElementById("calendar");
+      container.innerHTML = "";
+
+      const now = new Date();
+      now.setHours(0,0,0,0);
+
+      // show current + next 2 months (simple, compact)
+      for (let m = 0; m < 3; m++) {
+        const d = new Date(now.getFullYear(), now.getMonth() + m, 1);
+        container.appendChild(buildMonth(d, reservations));
+      }
+    }
+
+    function buildMonth(date, reservations) {
+      const month = date.getMonth();
+      const year = date.getFullYear();
+      const monthNames = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
+
+      const table = document.createElement("table");
+      table.className = "cal-month";
+
+      const head = document.createElement("thead");
+      const trh = document.createElement("tr");
+      const th = document.createElement("th");
+      th.className = "cal-head";
+      th.colSpan = 7;
+      th.textContent = `${monthNames[month]} ${year}`;
+      trh.appendChild(th);
+      head.appendChild(trh);
+
+      const trw = document.createElement("tr");
+      ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
+        const td = document.createElement("th");
+        td.className = "cal-weekday";
+        td.textContent = d;
+        trw.appendChild(td);
+      });
+      head.appendChild(trw);
+      table.appendChild(head);
+
+      const body = document.createElement("tbody");
+
+      // first day offset (Monday-first)
+      const first = new Date(year, month, 1);
+      let start = (first.getDay() + 6) % 7; // JS Sunday=0 -> shift to Monday=0
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      let row = document.createElement("tr");
+
+      for (let i = 0; i < start; i++) row.appendChild(document.createElement("td"));
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("td");
+        cell.textContent = day;
+
+        const current = new Date(year, month, day);
+        current.setHours(0,0,0,0);
+
+        const isReserved = reservations.some(r => {
+          const s = parseISO(r.start);
+          const e = parseISO(r.end);
+          return current >= s && current <= e;
+        });
+
+        const isPast = current < parseISO(todayISO());
+
+        if (isReserved) cell.className = "day-reserved";
+        else if (isPast) cell.className = "day-reserved"; // past treated as not bookable
+        else cell.className = "day-available";
+
+        row.appendChild(cell);
+
+        if ((start + day) % 7 === 0) {
+          body.appendChild(row);
+          row = document.createElement("tr");
+        }
+      }
+
+      if (row.children.length) body.appendChild(row);
+      table.appendChild(body);
+
+      return table;
+    }
+
+    // ---------- form validation (B+C+D) ----------
+    function attachValidation(reservations) {
+      const form = document.getElementById("resForm");
+      const startEl = document.getElementById("start_date");
+      const endEl   = document.getElementById("end_date");
+      const msgOk = document.getElementById("msgOk");
+      const msgErr = document.getElementById("msgErr");
+
+      const show = (el, text) => {
+        msgOk.style.display = "none";
+        msgErr.style.display = "none";
+        el.textContent = text;
+        el.style.display = "block";
+      };
+
+      // D: end date must be >= start date (and update end.min dynamically)
+      startEl.addEventListener("change", () => {
+        if (startEl.value) endEl.min = startEl.value;
+      });
+
+      form.addEventListener("submit", (e) => {
+        msgOk.style.display = "none";
+        msgErr.style.display = "none";
+
+        const s = startEl.value;
+        const eDate = endEl.value;
+
+        if (!s || !eDate) return; // browser required will handle
+
+        const start = parseISO(s);
+        const end = parseISO(eDate);
+        const today = parseISO(todayISO());
+
+        // C: no past dates
+        if (start < today || end < today) {
+          e.preventDefault();
+          show(msgErr, "Kies een start- en einddatum vanaf vandaag (verleden is niet boekbaar).");
+          return;
+        }
+
+        // D: end must be >= start
+        if (end < start) {
+          e.preventDefault();
+          show(msgErr, "De einddatum kan niet vóór de startdatum liggen.");
+          return;
+        }
+
+        // B: overlap detection (block request if clash)
+        const clash = reservations.some(r => {
+          const rs = parseISO(r.start);
+          const re = parseISO(r.end);
+          return rangeOverlaps(start, end, rs, re);
+        });
+
+        if (clash) {
+          e.preventDefault();
+          show(msgErr, "Deze periode overlapt met een bestaande reservering. Kies een andere periode.");
+          return;
+        }
+
+        // If everything is fine, allow submit (request.php will send emails)
+        show(msgOk, "Je aanvraag wordt verstuurd — bedankt! (Je krijgt zo een bevestigingsmail.)");
+      });
+    }
+
+    init();
+  </script>
 </body>
 </html>
