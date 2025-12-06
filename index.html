@@ -463,7 +463,7 @@ h1{
             <label>Einddatum</label>
             <input type="date" id="end_date" name="end_date" required>
 
-            <label>Bericht (optioneel)</label>
+            <label>Bericht</label>
             <textarea id="message" name="message" rows="4"></textarea>
 
             <button type="submit" class="btn">Aanvraag versturen</button>
@@ -477,143 +477,163 @@ h1{
 
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
-    const calendarContainer = document.getElementById("calendar");
-    const reservationsUrl = "reservations.json";
+  const calendarContainer = document.getElementById("calendar");
+  const reservationsUrl = "reservations.json";
 
-    const MONTHS_VISIBLE = 2;   // altijd 2 maanden zichtbaar
-    let currentOffset = 0;      // navigation offset (0 = huidige maand)
+  const MONTHS_VISIBLE = 2;
+  let currentOffset = 0;
 
-    async function loadReservations() {
-        try {
-            const response = await fetch(reservationsUrl + "?v=" + Date.now());
-            return await response.json();
-        } catch (e) {
-            console.error("Kan reservations.json niet laden", e);
-            return {};
+  // ----------- helpers -----------
+  const toISO = (d) => {
+    const x = new Date(d);
+    x.setHours(0,0,0,0);
+    return x.toISOString().slice(0,10);
+  };
+
+  const parseISO = (iso) => {
+    const d = new Date(iso + "T00:00:00");
+    d.setHours(0,0,0,0);
+    return d;
+  };
+
+  const addDays = (d, n) => {
+    const x = new Date(d);
+    x.setDate(x.getDate() + n);
+    return x;
+  };
+
+  // Bouw een Set met alle gereserveerde datums (dag per dag)
+  function normalizeReservations(raw) {
+    const set = new Set();
+
+    // 1) Als het al een object-map is: { "YYYY-MM-DD": true, ... }
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      Object.keys(raw).forEach(k => {
+        if (k && /^\d{4}-\d{2}-\d{2}$/.test(k) && raw[k]) set.add(k);
+      });
+      return set;
+    }
+
+    // 2) Als het een array is: [{start:"..", end:".."}, ...]
+    if (Array.isArray(raw)) {
+      for (const item of raw) {
+        if (!item || !item.start || !item.end) continue;
+        let s = parseISO(item.start);
+        const e = parseISO(item.end);
+        while (s <= e) {
+          set.add(toISO(s));
+          s = addDays(s, 1);
         }
+      }
+      return set;
     }
 
-    async function renderCalendar() {
-        const reservations = await loadReservations();
-        calendarContainer.innerHTML = "";
+    return set;
+  }
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "calendar-wrapper";
+  // ----------- load & render -----------
+  async function loadReservedDates() {
+    try {
+      const res = await fetch(reservationsUrl + "?v=" + Date.now(), { cache: "no-store" });
+      const raw = await res.json();
+      return normalizeReservations(raw);
+    } catch (e) {
+      console.error("Kan reservations.json niet laden:", e);
+      return new Set();
+    }
+  }
 
-        const nav = document.createElement("div");
-        nav.className = "calendar-nav";
-        nav.innerHTML = `
-            <button id="prevMonth">&laquo; Vorige</button>
-            <button id="nextMonth">Volgende &raquo;</button>
-        `;
-        wrapper.appendChild(nav);
+  async function renderCalendar() {
+    const reservedSet = await loadReservedDates();
+    calendarContainer.innerHTML = "";
 
-        const today = new Date();
-        today.setHours(0,0,0,0);
+    const wrapper = document.createElement("div");
+    wrapper.className = "calendar-wrapper";
 
-        for (let i = 0; i < MONTHS_VISIBLE; i++) {
-            const date = new Date(
-                today.getFullYear(), 
-                today.getMonth() + currentOffset + i, 
-                1
-            );
-            wrapper.appendChild(buildMonth(date, reservations, today));
-        }
+    const nav = document.createElement("div");
+    nav.className = "calendar-nav";
+    nav.innerHTML = `
+      <button id="prevMonth">&laquo; Vorige</button>
+      <button id="nextMonth">Volgende &raquo;</button>
+    `;
+    wrapper.appendChild(nav);
 
-        calendarContainer.appendChild(wrapper);
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-        document.getElementById("prevMonth").onclick = () => {
-            currentOffset -= 1;
-            renderCalendar();
-        };
-        document.getElementById("nextMonth").onclick = () => {
-            currentOffset += 1;
-            renderCalendar();
-        };
+    for (let i = 0; i < MONTHS_VISIBLE; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth() + currentOffset + i, 1);
+      wrapper.appendChild(buildMonth(d, reservedSet, today));
     }
 
-    function buildMonth(date, reservations, today) {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const monthName = date.toLocaleString("nl-NL", { month: "long", year: "numeric" });
+    calendarContainer.appendChild(wrapper);
 
-        const monthDiv = document.createElement("div");
-        monthDiv.className = "month";
+    document.getElementById("prevMonth").onclick = () => { currentOffset -= 1; renderCalendar(); };
+    document.getElementById("nextMonth").onclick = () => { currentOffset += 1; renderCalendar(); };
+  }
 
-        const title = document.createElement("h3");
-        title.textContent = monthName;
-        monthDiv.appendChild(title);
+  function buildMonth(date, reservedSet, today) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const monthName = date.toLocaleString("nl-NL", { month: "long", year: "numeric" });
 
-        const grid = document.createElement("div");
-        grid.className = "calendar-grid";
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "month";
 
-        ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
-            const wd = document.createElement("div");
-            wd.className = "weekday";
-            wd.textContent = d;
-            grid.appendChild(wd);
-        });
+    const title = document.createElement("h3");
+    title.textContent = monthName;
+    monthDiv.appendChild(title);
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+    const grid = document.createElement("div");
+    grid.className = "calendar-grid";
 
-        for (let i = 0; i < offset; i++) {
-            const empty = document.createElement("div");
-            empty.className = "empty";
-            grid.appendChild(empty);
-        }
+    ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
+      const wd = document.createElement("div");
+      wd.className = "weekday";
+      wd.textContent = d;
+      grid.appendChild(wd);
+    });
 
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const offset = (firstDay === 0 ? 6 : firstDay - 1);
 
-        for (let d = 1; d <= daysInMonth; d++) {
-            const dayEl = document.createElement("div");
-            dayEl.className = "day";
-            dayEl.textContent = d;
-
-            const key = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-            const thisDate = new Date(year, month, d);
-            thisDate.setHours(0,0,0,0);
-
-// Verleden blokkeren
-if (thisDate < today) {
-    dayEl.classList.add("past");
-} 
-else if (reservations[key]) {
-    // Reservatie PERIODE detecteren
-    const prevKey = `${year}-${String(month+1).padStart(2,"0")}-${String(d-1).padStart(2,"0")}`;
-    const nextKey = `${year}-${String(month+1).padStart(2,"0")}-${String(d+1).padStart(2,"0")}`;
-
-    const prevReserved = reservations[prevKey];
-    const nextReserved = reservations[nextKey];
-
-    if (!prevReserved && nextReserved) {
-        dayEl.classList.add("range-start");
+    for (let i = 0; i < offset; i++) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      grid.appendChild(empty);
     }
-    else if (prevReserved && nextReserved) {
-        dayEl.classList.add("range-middle");
-    }
-    else if (prevReserved && !nextReserved) {
-        dayEl.classList.add("range-end");
-    }
-    else {
-        // enkele reservatie zonder reeks
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayEl = document.createElement("div");
+      dayEl.className = "day";
+      dayEl.textContent = d;
+
+      const key = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      const thisDate = parseISO(key);
+
+      // (A) verleden
+      if (thisDate < today) {
+        dayEl.classList.add("past");
+        continue;
+      }
+
+      // (B) gereserveerd (nu correct voor zowel map als array JSON)
+      if (reservedSet.has(key)) {
         dayEl.classList.add("reserved");
-    }
-}
-else {
-    dayEl.classList.add("available");
-}
+      } else {
+        dayEl.classList.add("available");
+      }
 
-
-
-            grid.appendChild(dayEl);
-        }
-
-        monthDiv.appendChild(grid);
-        return monthDiv;
+      grid.appendChild(dayEl);
     }
 
-    renderCalendar();
+    monthDiv.appendChild(grid);
+    return monthDiv;
+  }
+
+  renderCalendar();
 });
 </script>
 
