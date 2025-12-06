@@ -417,7 +417,7 @@ h1{
     container.innerHTML = "";
     const now = new Date();
 
-    for(let m=0;m<4;m++){
+    for(let m=0;m<3;m++){
       const d = new Date(now.getFullYear(), now.getMonth()+m, 1);
       container.appendChild(buildMonth(d));
     }
