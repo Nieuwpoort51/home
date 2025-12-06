@@ -502,94 +502,38 @@ h1{
 document.addEventListener("DOMContentLoaded", async () => {
   const calendarContainer = document.getElementById("calendar");
   const reservationsUrl = "reservations.json";
-
   const MONTHS_VISIBLE = 2;
   let currentOffset = 0;
 
-  const toISO = (d) => {
-    const x = new Date(d);
-    x.setHours(0,0,0,0);
-    return x.toISOString().slice(0,10);
-  };
+  const parseISO = iso => new Date(iso + "T00:00:00");
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const toISO = d => { const x = new Date(d); x.setHours(0,0,0,0); return x.toISOString().slice(0,10); };
 
-  const parseISO = (iso) => {
-    const d = new Date(iso + "T00:00:00");
-    d.setHours(0,0,0,0);
-    return d;
-  };
-
-  const addDays = (d, n) => {
-    const x = new Date(d);
-    x.setDate(x.getDate() + n);
-    return x;
-  };
-
+  // JSON inladen
   async function loadReservations() {
     try {
-      const res = await fetch(reservationsUrl + "?v=" + Date.now(), { cache: "no-store" });
-      const raw = await res.json();
-      return raw.filter(r => r.start && r.end);
-    } catch (e) {
-      console.error("Kan reservations.json niet laden:", e);
+      const res = await fetch(reservationsUrl + "?v=" + Date.now());
+      return await res.json();
+    } catch(e) {
+      console.error("Kan reservations.json niet laden", e);
       return [];
     }
   }
 
-  function buildReservedMap(reservations) {
-    const map = {}; // key = YYYY-MM-DD, value = { wie, start, end }
+  function buildReservedSet(reservations) {
+    const set = new Set();
     reservations.forEach(r => {
-      let d = parseISO(r.start);
+      let current = parseISO(r.start);
       const end = parseISO(r.end);
-      while (d <= end) {
-        const iso = toISO(d);
-        map[iso] = { wie: r.wie, start: r.start, end: r.end };
-        d = addDays(d, 1);
+      while(current <= end){
+        set.add(toISO(current));
+        current = addDays(current, 1);
       }
     });
-    return map;
+    return set;
   }
 
-  function getRangeClass(date, reservation) {
-    const iso = toISO(date);
-    const startISO = reservation.start;
-    const endISO = reservation.end;
-    if (iso === startISO && iso === endISO) return "range-start range-end";
-    if (iso === startISO) return "range-start";
-    if (iso === endISO) return "range-end";
-    return "range-middle";
-  }
-
-  async function renderCalendar() {
-    const reservations = await loadReservations();
-    const reservedMap = buildReservedMap(reservations);
-    calendarContainer.innerHTML = "";
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "calendar-wrapper";
-
-    const nav = document.createElement("div");
-    nav.className = "calendar-nav";
-    nav.innerHTML = `
-      <button id="prevMonth">&laquo; Vorige</button>
-      <button id="nextMonth">Volgende &raquo;</button>
-    `;
-    wrapper.appendChild(nav);
-
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    for (let i = 0; i < MONTHS_VISIBLE; i++) {
-      const d = new Date(today.getFullYear(), today.getMonth() + currentOffset + i, 1);
-      wrapper.appendChild(buildMonth(d, reservedMap, today));
-    }
-
-    calendarContainer.appendChild(wrapper);
-
-    document.getElementById("prevMonth").onclick = () => { currentOffset -= 1; renderCalendar(); };
-    document.getElementById("nextMonth").onclick = () => { currentOffset += 1; renderCalendar(); };
-  }
-
-  function buildMonth(date, reservedMap, today) {
+  function buildMonth(date, reservedSet) {
     const year = date.getFullYear();
     const month = date.getMonth();
     const monthName = date.toLocaleString("nl-NL", { month: "long", year: "numeric" });
@@ -605,46 +549,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.className = "calendar-grid";
 
     ["Ma","Di","Wo","Do","Vr","Za","Zo"].forEach(d => {
-        const wd = document.createElement("div");
-        wd.className = "weekday";
-        wd.textContent = d;
-        grid.appendChild(wd);
+      const wd = document.createElement("div");
+      wd.className = "weekday";
+      wd.textContent = d;
+      grid.appendChild(wd);
     });
 
     const firstDay = new Date(year, month, 1).getDay();
     const offset = (firstDay === 0 ? 6 : firstDay - 1);
-
-    for (let i = 0; i < offset; i++) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        grid.appendChild(empty);
+    for(let i=0;i<offset;i++){
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      grid.appendChild(empty);
     }
 
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-    for (let d = 1; d <= daysInMonth; d++) {
-        const dayEl = document.createElement("div");
-        dayEl.className = "day";
-        dayEl.textContent = d;
+    for(let d=1; d<=daysInMonth; d++){
+      const dayEl = document.createElement("div");
+      dayEl.className = "day";
+      dayEl.textContent = d;
 
-        const thisDate = new Date(year, month, d);
-        const iso = toISO(thisDate);
+      const thisDate = new Date(year, month, d);
+      const isoDate = toISO(thisDate);
 
-        if (thisDate < today) dayEl.classList.add("past");
+      if(thisDate < today) dayEl.classList.add("past");
+      else if(reservedSet.has(isoDate)) dayEl.classList.add("reserved");
+      else dayEl.classList.add("available");
 
-        if (reservedMap[iso]) {
-            const rangeClass = getRangeClass(thisDate, reservedMap[iso]);
-            dayEl.classList.add("reserved", ...rangeClass.split(" "));
-            dayEl.title = `Gereserveerd door ${reservedMap[iso].wie}`;
-        } else if (thisDate >= today) {
-            dayEl.classList.add("available");
-        }
-
-        grid.appendChild(dayEl);
+      grid.appendChild(dayEl);
     }
 
     monthDiv.appendChild(grid);
     return monthDiv;
+  }
+
+  async function renderCalendar() {
+    const reservations = await loadReservations();
+    const reservedSet = buildReservedSet(reservations);
+    calendarContainer.innerHTML = "";
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "calendar-wrapper";
+
+    const nav = document.createElement("div");
+    nav.className = "calendar-nav";
+    nav.innerHTML = `
+      <button id="prevMonth">&laquo; Vorige</button>
+      <button id="nextMonth">Volgende &raquo;</button>
+    `;
+    wrapper.appendChild(nav);
+
+    const today = new Date();
+
+    for(let i=0;i<MONTHS_VISIBLE;i++){
+      const d = new Date(today.getFullYear(), today.getMonth()+currentOffset+i, 1);
+      wrapper.appendChild(buildMonth(d, reservedSet));
+    }
+
+    calendarContainer.appendChild(wrapper);
+
+    document.getElementById("prevMonth").onclick = () => { currentOffset--; renderCalendar(); };
+    document.getElementById("nextMonth").onclick = () => { currentOffset++; renderCalendar(); };
   }
 
   renderCalendar();
